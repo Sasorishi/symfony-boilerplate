@@ -1,0 +1,17 @@
+   # Utiliser une image Node.js officielle
+   FROM node:18
+
+   # Définir le répertoire de travail
+   WORKDIR /var/www/react
+
+   # Copier les fichiers package.json et package-lock.json (si disponible)
+   COPY package*.json ./
+
+   # Installer les dépendances
+   RUN npm install
+
+   # Copier le reste du code source
+   COPY . .
+
+   # Commande pour lancer le projet React
+   CMD ["npm", "start"]
