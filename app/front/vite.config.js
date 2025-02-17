@@ -1,12 +1,13 @@
 import { defineConfig } from 'vite'
 import symfonyPlugin from 'vite-plugin-symfony'
+import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [symfonyPlugin()],
+  plugins: [symfonyPlugin(), tailwindcss()],
   server: {
     port: 5173,
-    strictPort: true, // Empêche Vite de changer de port
+    strictPort: false, // Empêche Vite de changer de port
     host: '0.0.0.0', // IMPORTANT: Permet d'écouter sur toutes les interfaces
     watch: {
       usePolling: true,
