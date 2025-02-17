@@ -55,3 +55,13 @@ test:
 # Lance ESLint
 front-lint:
 	$(DOCKER_COMPOSE) exec $(NODE_SERVICE) npm run lint
+
+# Lance Phpstan
+phpstan:
+	$(DOCKER_COMPOSE) exec $(PHP_SERVICE) vendor/bin/phpstan analyse
+
+phpcs:
+	$(DOCKER_COMPOSE) exec $(PHP_SERVICE) vendor/bin/phpcs --standard=PSR12 src/
+
+phpcbf:
+	$(DOCKER_COMPOSE) exec $(PHP_SERVICE) vendor/bin/phpcbf --standard=PSR12 src/
