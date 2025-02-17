@@ -2,12 +2,12 @@ services:
   php:
     build:
       context: ./app/back
-      dockerfile: Dockerfile # Assurez-vous que ce chemin est correct
+      dockerfile: Dockerfile
     volumes:
       - ./app/back:/var/www/app/symfony
     working_dir: /var/www/app/symfony
     depends_on:
-      - db
+      - mysql
     ports:
       # HTTP
       - target: 80
@@ -21,6 +21,8 @@ services:
       - target: 443
         published: ${HTTP3_PORT:-443}
         protocol: udp
+    labels:
+      com.docker.compose.project: '${DOMAIN_NAME:-default}'
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:80/health']
       interval: 10s
@@ -31,31 +33,56 @@ services:
   node:
     build:
       context: ./app/front
-      dockerfile: Dockerfile.node # Chemin vers le nouveau Dockerfile.node
+      dockerfile: Dockerfile.node
     volumes:
-      - ./app/front:/var/www/react # Montez le répertoire local dans le conteneur
-    working_dir: /var/www/react # Assurez-vous que le répertoire de travail est correct
+      - ./app/front:/var/www/react
+    working_dir: /var/www/react
     ports:
       - '5173:5173'
     command: ['npm', 'run', 'dev']
     environment:
-      - VITE_SERVER_HOST=0.0.0.0 # Permet d'écouter toutes les connexions
+      - VITE_SERVER_HOST=0.0.0.0
     depends_on:
-      - php # Assure que Symfony démarre avant Vite
+      - php
     networks:
       - symfony-vite-network
 
-  db:
+  mysql:
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: symfony
-      MYSQL_USER: symfony
-      MYSQL_PASSWORD: symfony
+      MYSQL_DATABASE: app_db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: password
     ports:
       - '3306:3306'
     volumes:
       - db_data:/var/lib/mysql
+      - ./config/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - symfony-vite-network
+    healthcheck:
+      test:
+        ['CMD', 'mysqladmin', 'ping', '-u', 'root', '-p${MYSQL_ROOT_PASSWORD}']
+      interval: 30s
+      retries: 5
+      start_period: 60s
+      timeout: 30s
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: admin
+      PMA_PASSWORD: password
+    ports:
+      - '${PMADB_PORT:-8080}:80'
+    networks:
+      - symfony-vite-network
+    volumes:
+      - ./config/apache/phpmyadmin.conf:/etc/apache2/conf-enabled/phpmyadmin.conf
+    labels:
+      com.docker.compose.project: '${DOMAIN_NAME:-default}'
 
 networks:
   symfony-vite-network:
