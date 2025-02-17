@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite';
-import symfonyPlugin from 'vite-plugin-symfony';
+import { defineConfig } from 'vite'
+import symfonyPlugin from 'vite-plugin-symfony'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -24,4 +24,4 @@ export default defineConfig({
     outDir: '../public/build', // Sortie des fichiers dans le dossier public de Symfony
     base: '/build/', // Cette ligne est importante pour servir à partir de la racine
   },
-});
+})
