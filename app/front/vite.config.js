@@ -1,3 +1,4 @@
+import path from 'path'
 import { defineConfig } from 'vite'
 import symfonyPlugin from 'vite-plugin-symfony'
 import tailwindcss from '@tailwindcss/vite'
@@ -5,6 +6,11 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [symfonyPlugin(), tailwindcss()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
   server: {
     port: 5173,
     strictPort: false, // Empêche Vite de changer de port
