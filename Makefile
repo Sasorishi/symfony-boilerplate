@@ -51,3 +51,7 @@ node-logs:
 # Exécuter les tests
 test:
 	$(DOCKER_COMPOSE) run --rm $(PHP_SERVICE) php bin/phpunit
+
+# Lance ESLint
+front-lint:
+	$(DOCKER_COMPOSE) exec $(NODE_SERVICE) npm run lint
