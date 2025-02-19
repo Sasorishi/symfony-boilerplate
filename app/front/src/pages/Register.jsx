@@ -13,19 +13,12 @@ const Register = () => {
     try {
       // Envoi des données au backend pour l'authentification
       const response = await axiosInstance.post('/api/register', {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email,
-          password: password,
-        }),
-        credentials: 'include', // Important pour utiliser les cookies
-        withCredentials: true,
+        email: email,
+        password: password,
       })
 
       if (response.ok) {
-        console.log('User added')
+        console.log(response.message)
       } else {
         // Si la connexion échoue, affiche un message d'erreur
         const data = await response.json()

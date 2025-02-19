@@ -20,7 +20,6 @@ class AuthController extends AbstractController
         if (!$data) {
             return new JsonResponse(['error' => 'Invalid JSON or empty body'], 400);
         }
-        dump($data); 
 
         $user = new User();
         $user->setEmail($data['email']);
