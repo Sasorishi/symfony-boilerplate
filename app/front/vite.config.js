@@ -8,6 +8,7 @@ export default defineConfig({
   plugins: [symfonyPlugin(), tailwindcss()],
   resolve: {
     alias: {
+      // eslint-disable-next-line no-undef
       '@': path.resolve(__dirname, './src'),
     },
   },
@@ -23,9 +24,6 @@ export default defineConfig({
     },
     open: false,
     https: false,
-    proxy: {
-      '/api': 'http://localhost:9000',
-    },
   },
   build: {
     outDir: '../public/build', // Sortie des fichiers dans le dossier public de Symfony
