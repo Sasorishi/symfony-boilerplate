@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     gnupg \
     libpq-dev \
+    libmariadb-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Installer les extensions PHP
@@ -27,7 +28,9 @@ RUN install-php-extensions \
     intl \
     opcache \
     zip \
-    pdo
+    pdo \
+    pdo_mysql \
+    pdo_pgsql
 
 # Installer les dépendances Composer
 RUN composer install --no-interaction --optimize-autoloader --no-scripts
