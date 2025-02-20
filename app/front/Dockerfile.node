@@ -13,5 +13,5 @@ RUN npm install --legacy-peer-deps
 # Copier le reste du code source
 COPY . .
 
-# Commande pour lancer le projet React
-CMD ["npm", "start"]
+# Commande pour démarrer l'application
+CMD ["npm", "run", "dev"]

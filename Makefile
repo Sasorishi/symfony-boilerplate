@@ -24,6 +24,14 @@ down:
 build:
 	$(DOCKER_COMPOSE) build
 
+# Rebuild sans cache
+rebuild:
+	$(DOCKER_COMPOSE) build --no-cache
+
+# Efface tous les conteneurs, images et volumes
+clean:
+	$(DOCKER_COMPOSE) down --volumes --rmi all --remove-orphans
+
 # Installer les dépendances PHP
 install-php:
 	$(DOCKER_COMPOSE) run --rm $(PHP_SERVICE) composer install
@@ -39,6 +47,12 @@ php:
 # Démarrer le serveur Node.js
 node:
 	$(DOCKER_COMPOSE) exec node bash
+
+install-php:
+	$(DOCKER_COMPOSE) run --rm $(PHP_SERVICE) composer install
+
+install-node:
+	$(DOCKER_COMPOSE) run --rm $(NODE_SERVICE) npm install
 
 # Afficher les logs du conteneur PHP
 php-logs:
