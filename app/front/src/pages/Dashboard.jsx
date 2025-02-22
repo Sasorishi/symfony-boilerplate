@@ -10,10 +10,9 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axiosInstance.get('/api/auth/user', {
+        await axiosInstance.get('/api/auth/user', {
           withCredentials: true,
         })
-        console.log('Utilisateur connecté:', response.data)
       } catch (error) {
         console.error(
           'Erreur lors de la vérification de la connexion:',

@@ -2,11 +2,11 @@ import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import axiosInstance from '@/utils/axios'
+import { Toaster, toast } from 'sonner'
 
 const Register = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState(null)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -17,18 +17,17 @@ const Register = () => {
       })
 
       if (response.ok) {
-        console.log(response.message)
-      } else {
-        const data = await response.json()
-        setError(data.message || 'Login failed')
+        toast(response.message)
       }
-    } catch (err) {
-      setError('An error occurred')
+    } catch (error) {
+      console.error('An error occurred during register', error)
+      toast('An error occurred')
     }
   }
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
+      <Toaster />
       <div className="w-full max-w-sm md:max-w-3xl">
         <div className="w-full max-w-md mx-auto mt-20 p-4 border rounded-md shadow-lg">
           <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>

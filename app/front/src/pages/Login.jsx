@@ -6,12 +6,12 @@ import { Label } from '@/components/ui/label'
 import axiosInstance from '@/utils/axios'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '@/stores/useStore'
+import { Toaster, toast } from 'sonner'
 
 const Login = () => {
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState(null)
   const setToken = useStore((state) => state.setToken)
   const setUser = useStore((state) => state.setUser)
 
@@ -38,19 +38,22 @@ const Login = () => {
         setUser(authResponse.data.user)
         navigate('/dashboard')
       } else {
-        setError('Login failed')
+        toast('Login failed')
       }
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        console.log('Authentication failed: Invalid credentials')
+        console.error('Authentication failed: Invalid credentials')
+        toast('Authentication failed: Invalid credentials')
       } else {
         console.error('An error occurred during authentication', error)
+        toast('An error occurred during authentication')
       }
     }
   }
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
+      <Toaster />
       <div className="w-full max-w-sm md:max-w-3xl">
         <div className="flex flex-col gap-6">
           <Card className="overflow-hidden">
