@@ -12,13 +12,21 @@ export default [
   pluginReact.configs.flat.recommended,
   {
     name: 'Prettier',
-    plugins: { prettier: pluginPrettier },
+    plugins: {
+      react: pluginReact,
+      prettier: pluginPrettier,
+    },
+    settings: {
+      react: {
+        version: 'detect',
+      },
+    },
     rules: {
       ...configPrettier.rules,
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
       'prettier/prettier': 'error',
-      'no-console': 'off',
+      'no-console': ['error', { allow: ['warn', 'error'] }],
     },
   },
 ]
