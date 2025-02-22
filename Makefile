@@ -48,12 +48,6 @@ php:
 node:
 	$(DOCKER_COMPOSE) exec node bash
 
-install-php:
-	$(DOCKER_COMPOSE) run --rm $(PHP_SERVICE) composer install
-
-install-node:
-	$(DOCKER_COMPOSE) run --rm $(NODE_SERVICE) npm install
-
 # Afficher les logs du conteneur PHP
 php-logs:
 	$(DOCKER_COMPOSE) logs php
@@ -77,5 +71,5 @@ phpstan:
 phpcs:
 	$(DOCKER_COMPOSE) exec $(PHP_SERVICE) vendor/bin/phpcs --standard=PSR12 src/
 
-phpcbf:
+back-lint:
 	$(DOCKER_COMPOSE) exec $(PHP_SERVICE) vendor/bin/phpcbf --standard=PSR12 src/
