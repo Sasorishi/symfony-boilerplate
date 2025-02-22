@@ -40,6 +40,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $user->setEmail($data['email']);
         $user->setPassword($passwordHasher->hashPassword($user, $data['password']));
         $user->setRoles(['ROLE_USER']);
+        $user->setCreatedAt(new \DateTimeImmutable());
 
         $em = $this->getEntityManager();
         $em->persist($user);

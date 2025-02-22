@@ -1,23 +1,23 @@
 import axios from 'axios'
+import { useStore } from '@/stores/useStore'
 
-// Créer une instance Axios avec une configuration de base
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
-  timeout: 10000, // Temps d'attente en millisecondes
-  withCredentials: true, // Assurer que les cookies de session sont envoyés avec chaque requête
+  timeout: 10000,
+  withCredentials: true,
 })
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = useStore.getState().token
     if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
+      config.headers['Authorization'] = `Bearer ${token}`
     }
-    return config;
+    return config
   },
   (error) => {
-    return Promise.reject(error);
+    return Promise.reject(error)
   }
-);
+)
 
 export default axiosInstance

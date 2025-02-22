@@ -5,12 +5,15 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import axiosInstance from '@/utils/axios'
 import { useNavigate } from 'react-router-dom'
+import { useStore } from '@/stores/useStore'
 
 const Login = () => {
+  const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
-  const navigate = useNavigate()
+  const setToken = useStore((state) => state.setToken)
+  const setUser = useStore((state) => state.setUser)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -27,12 +30,12 @@ const Login = () => {
       )
 
       if (response.status === 200) {
-        // Stocker le token dans le localStorage
-        localStorage.setItem('token', response.data.token)
+        const authResponse = await axiosInstance.get('/api/auth/user', {
+          withCredentials: true,
+        })
 
-        // Afficher à la fois l'utilisateur et le token dans la console
-        console.log('Token:', response.data.token)
-
+        setToken(response.data.token)
+        setUser(authResponse.data.user)
         navigate('/dashboard')
       } else {
         setError('Login failed')

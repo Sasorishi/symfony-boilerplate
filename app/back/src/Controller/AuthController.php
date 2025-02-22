@@ -54,10 +54,7 @@ class AuthController extends AbstractController
             ], Response::HTTP_UNAUTHORIZED);
         }
 
-        // Si les informations sont valides, générer un token JWT
         $token = $jwtManager->create($user);
-
-        // Retourner une réponse contenant le token
         return new JsonResponse(['token' => $token]);
     }
 
@@ -74,8 +71,8 @@ class AuthController extends AbstractController
         return new JsonResponse(['message' => 'CORS test réussi!'], Response::HTTP_OK);
     }
 
-    #[Route('/api/user', name: 'api_user', methods: ['GET'])]
-    public function user(): JsonResponse
+    #[Route('/api/auth/user', name: 'api_auth_user', methods: ['GET'])]
+    public function getAuthUser(): JsonResponse
     {
         $user = $this->getUser();
 
@@ -86,7 +83,11 @@ class AuthController extends AbstractController
         }
 
         return new JsonResponse([
-            'user' => $user->getUserIdentifier(),
+            'user' => [
+                'id' => $user->getId(),
+                'email' => $user->getEmail(),
+                'created_at' => $user->getCreatedAt()->format('Y-m-d H:i:s'),
+            ],
         ], Response::HTTP_OK);
     }
 }

@@ -1,15 +1,16 @@
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axiosInstance from '@/utils/axios'
+import { useStore } from '@/stores/useStore'
 
 const Dashboard = () => {
-  const token = localStorage.getItem('token')
+  const logout = useStore((state) => state.logout)
   const navigate = useNavigate()
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axiosInstance.get('/api/user', {
+        const response = await axiosInstance.get('/api/auth/user', {
           withCredentials: true,
         })
         console.log('Utilisateur connecté:', response.data)
@@ -22,16 +23,12 @@ const Dashboard = () => {
     }
 
     fetchUserData()
-  }, [token])
+  }, [])
 
   const handleLogout = async () => {
     try {
       await axiosInstance.post('/api/logout')
-
-      // Supprimer le token du stockage local
-      localStorage.removeItem('token')
-
-      // Rediriger l'utilisateur vers la page de login
+      logout()
       navigate('/login')
     } catch (error) {
       console.error('Erreur lors de la déconnexion:', error)
