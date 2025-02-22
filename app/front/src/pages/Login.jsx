@@ -4,35 +4,45 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import axiosInstance from '@/utils/axios'
+import { useNavigate } from 'react-router-dom'
 
 const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
+  const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      // Envoi des données au backend pour l'authentification
-      const response = await axiosInstance.post('login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await axiosInstance.post(
+        'api/login',
+        { username: email, password: password },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
         },
-        body: JSON.stringify({ email, password }),
-        credentials: 'include', // Important pour utiliser les cookies
-      })
+      )
 
-      if (response.ok) {
-        // Si la connexion réussit, tu peux rediriger ou gérer l'état
-        window.location.href = '/dashboard' // Redirection après connexion réussie
+      if (response.status === 200) {
+        // Stocker le token dans le localStorage
+        localStorage.setItem('token', response.data.token)
+
+        // Afficher à la fois l'utilisateur et le token dans la console
+        console.log('Token:', response.data.token)
+
+        navigate('/dashboard')
       } else {
-        // Si la connexion échoue, affiche un message d'erreur
-        const data = await response.json()
-        setError(data.message || 'Login failed')
+        setError('Login failed')
       }
-    } catch (err) {
-      setError('An error occurred')
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        console.log('Authentication failed: Invalid credentials')
+      } else {
+        console.error('An error occurred during authentication', error)
+      }
     }
   }
 
@@ -42,7 +52,8 @@ const Login = () => {
         <div className="flex flex-col gap-6">
           <Card className="overflow-hidden">
             <CardContent className="grid p-0 md:grid-cols-2">
-              <form className="p-6 md:p-8">
+              {/* <form className="p-6 md:p-8" method="POST" action="/login"> */}
+              <form className="p-6 md:p-8" onSubmit={handleSubmit}>
                 <div className="flex flex-col gap-6">
                   <div className="flex flex-col items-center text-center">
                     <h1 className="text-2xl font-bold">Welcome back</h1>
@@ -55,7 +66,9 @@ const Login = () => {
                     <Input
                       id="email"
                       type="email"
+                      // name="_username"
                       placeholder="m@example.com"
+                      onChange={(e) => setEmail(e.target.value)}
                       required
                     />
                   </div>
@@ -69,7 +82,13 @@ const Login = () => {
                         Forgot your password?
                       </a>
                     </div>
-                    <Input id="password" type="password" required />
+                    <Input
+                      id="password"
+                      type="password"
+                      // name="_password"
+                      required
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
                   </div>
                   <Button type="submit" className="w-full">
                     Login
@@ -119,7 +138,10 @@ const Login = () => {
                   </div>
                   <div className="text-center text-sm">
                     Don&apos;t have an account?{' '}
-                    <a href="#" className="underline underline-offset-4">
+                    <a
+                      href="/register"
+                      className="underline underline-offset-4"
+                    >
                       Sign up
                     </a>
                   </div>
@@ -127,7 +149,7 @@ const Login = () => {
               </form>
               <div className="relative hidden bg-muted md:block">
                 <img
-                  src="/placeholder.svg"
+                  src="https://placehold.co/600x400"
                   alt="Image"
                   className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
                 />
