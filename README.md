@@ -6,8 +6,10 @@ This structure is designed to separate the frontend (React + Vite) from the back
 
 ## Features
 
-- **Symfony Backend**: A robust backend built with Symfony, featuring JWT authentication and CORS support.
-- **React Frontend**: A modern frontend using React and Vite for fast development and hot module replacement (HMR).
+- **Symfony Backend**: A robust backend built with Symfony, featuring **JWT authentication** and **CORS** support for secure API communication.
+- **React Frontend**: A modern frontend built using **React** and **Vite** for fast development and **Hot Module Replacement (HMR)**.
+- **Tailwind CSS**: A utility-first CSS framework for building custom designs quickly and easily.
+- **ShadCN UI**: A set of composable UI components integrated with **Tailwind CSS** to speed up UI development.
 - **Docker Support**: Easily run the application in isolated containers using Docker and Docker Compose.
 - **ESLint and Prettier**: Integrated code quality tools to maintain coding standards.
 
