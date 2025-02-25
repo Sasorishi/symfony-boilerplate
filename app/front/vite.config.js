@@ -26,7 +26,7 @@ export default defineConfig({
     https: false,
   },
   build: {
-    outDir: '../public/build', // Sortie des fichiers dans le dossier public de Symfony
+    outDir: './public/build', // Sortie des fichiers dans le dossier public de Symfony
     base: '/build/', // Cette ligne est importante pour servir à partir de la racine
   },
 })
