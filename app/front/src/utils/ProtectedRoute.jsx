@@ -1,9 +1,9 @@
 import React from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
-import { useStore } from '@/stores/useStore'
+import { userStore } from '@/stores/user/userStore'
 
 const ProtectedRoute = () => {
-  const token = useStore((state) => state.token)
+  const token = userStore((state) => state.token)
   return token ? <Outlet /> : <Navigate to="/login" replace />
 }
 

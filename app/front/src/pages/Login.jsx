@@ -5,15 +5,15 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import axiosInstance from '@/utils/axios'
 import { useNavigate } from 'react-router-dom'
-import { useStore } from '@/stores/useStore'
+import { userStore } from '@/stores/user/userStore'
 import { Toaster, toast } from 'sonner'
 
 const Login = () => {
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const setToken = useStore((state) => state.setToken)
-  const setUser = useStore((state) => state.setUser)
+  const setToken = userStore((state) => state.setToken)
+  const setUser = userStore((state) => state.setUser)
 
   const handleSubmit = async (e) => {
     e.preventDefault()

@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axiosInstance from '@/utils/axios'
-import { useStore } from '@/stores/useStore'
+import { userStore } from '@/stores/user/userStore'
 
 const Dashboard = () => {
-  const logout = useStore((state) => state.logout)
+  const logout = userStore((state) => state.logout)
   const navigate = useNavigate()
 
   useEffect(() => {

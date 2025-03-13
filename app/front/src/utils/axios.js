@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { useStore } from '@/stores/useStore'
+import { userStore } from '@/stores/user/userStore'
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -9,7 +9,7 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = useStore.getState().token
+    const token = userStore.getState().token
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`
     }
