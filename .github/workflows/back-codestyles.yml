@@ -1,4 +1,4 @@
-name: Back-end Checks
+name: Back Checks Codestyles
 
 on:
   push:
@@ -31,12 +31,6 @@ jobs:
           key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-php-
-
-      - name: Copy .env.example
-        run: cp .env.example .env
-
-      - name: Install dependencies
-        run: composer install --prefer-dist --no-progress
 
       - name: Fix PHP Code Style
         run: vendor/bin/phpcbf --standard=PSR12 src/ || true
