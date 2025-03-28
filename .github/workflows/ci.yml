@@ -1,0 +1,112 @@
+name: Complete Build Workflow
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  back-build:
+    runs-on: ubuntu-latest
+    env:
+      APP_ENV: test
+      APP_DEBUG: 1
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer:v2
+          coverage: none
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v3
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: Vérifier si .env.example existe
+        run: |
+          if [ ! -f app/back/.env.example ]; then
+            echo ".env.example n'existe pas."
+            exit 1
+          fi
+
+      - name: Copy .env.example
+        run: cp app/back/.env.example app/back/.env
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+        working-directory: app/back
+
+  front-build:
+    runs-on: ubuntu-latest
+    needs: back-build
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: app/front
+
+      - name: Run Build
+        run: npm run build
+        working-directory: app/front
+
+  back-codestyles:
+    runs-on: ubuntu-latest
+    needs: front-build
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer:v2
+          coverage: none
+
+      - name: Vérifier si PHPCS est installé
+        run: |
+          if [ ! -f vendor/bin/phpcs ]; then
+            echo "PHP_CodeSniffer n'est pas installé."
+            exit 1
+          fi
+
+      - name: Fix PHP Code Style
+        run: vendor/bin/phpcbf --standard=PSR12 src/ || true
+        working-directory: app/back
+
+      - name: Run PHP_CodeSniffer
+        run: vendor/bin/phpcs --standard=PSR12 src/
+        working-directory: app/back
+
+  front-codestyles:
+    runs-on: ubuntu-latest
+    needs: back-codestyles
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Run ESLint Check
+        run: npm run lint
+        working-directory: app/front
