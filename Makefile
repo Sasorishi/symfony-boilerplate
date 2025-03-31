@@ -33,19 +33,19 @@ clean:
 	$(DOCKER_COMPOSE) down --volumes --rmi all --remove-orphans
 
 # Installer les dépendances PHP
-install-php:
+install-back:
 	$(DOCKER_COMPOSE) run --rm $(PHP_SERVICE) composer install
 
 # Installer les dépendances Node.js
-install-node:
+install-front:
 	$(DOCKER_COMPOSE) run --rm $(NODE_SERVICE) npm install
 
 # Démarrer le serveur PHP
-php:
+back:
 	$(DOCKER_COMPOSE) exec php bash
 
 # Démarrer le serveur Node.js
-node:
+front:
 	$(DOCKER_COMPOSE) exec node bash
 
 # Afficher les logs du conteneur PHP

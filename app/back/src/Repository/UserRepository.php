@@ -34,6 +34,11 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
+    /**
+     * @param array<string, string> $data
+     * @param UserPasswordHasherInterface $passwordHasher
+     * @return void
+     */
     public function createUser(array $data, UserPasswordHasherInterface $passwordHasher): void
     {
         $user = new User();

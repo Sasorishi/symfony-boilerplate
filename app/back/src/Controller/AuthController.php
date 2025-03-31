@@ -9,27 +9,21 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class AuthController extends AbstractController
 {
     private UserRepository $userRepository;
     private UserPasswordHasherInterface $passwordHasher;
-    private Security $security;
 
     public function __construct(
         UserRepository $userRepository,
         UserPasswordHasherInterface $passwordHasher,
-        Security $security
     ) {
         $this->userRepository = $userRepository;
         $this->passwordHasher = $passwordHasher;
-        $this->security = $security;
     }
 
     #[Route('/api/register', name: 'api_register', methods: ['POST'])]
@@ -76,7 +70,7 @@ class AuthController extends AbstractController
     {
         $user = $this->getUser();
 
-        if (!$user) {
+        if (!$user instanceof User) {
             return $this->json([
                 'message' => 'Unauthorized',
             ], Response::HTTP_UNAUTHORIZED);
