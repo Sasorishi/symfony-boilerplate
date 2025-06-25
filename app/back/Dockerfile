@@ -19,18 +19,25 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gnupg \
     libpq-dev \
     libmariadb-dev \
+    autoconf \
+    bison \
+    re2c \
+    libxml2-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Installer les extensions PHP
 RUN install-php-extensions \
     @composer \
-    apcu \
     intl \
     opcache \
     zip \
     pdo \
     pdo_mysql \
     pdo_pgsql
+
+# Installer APCu
+RUN pecl install apcu && \
+    docker-php-ext-enable apcu
 
 # Installer les dépendances Composer
 RUN composer install --no-interaction --optimize-autoloader --no-scripts

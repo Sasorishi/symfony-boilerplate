@@ -1,4 +1,18 @@
 services:
+  traefik:
+    image: traefik:v2.10
+    command:
+      - --api.insecure=true
+      - --providers.docker=true
+      - --entrypoints.web.address=:80
+    ports:
+      - "80:80"
+      - "8081:8080" # dashboard Traefik
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - symfony-vite-network
+
   php:
     build:
       context: ./app/back
@@ -22,7 +36,10 @@ services:
         published: ${HTTP3_PORT:-443}
         protocol: udp
     labels:
-      com.docker.compose.project: '${DOMAIN_NAME:-default}'
+      - "com.docker.compose.project: '${DOMAIN_NAME:-default}"
+      - "traefik.enable=true"
+      - "traefik.http.routers.project.rule=Host(`${DOMAIN_NAME:-default}.localhost`)"
+      - "traefik.http.services.project.loadbalancer.server.port=80"
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:80/health']
       interval: 10s
@@ -84,7 +101,10 @@ services:
     volumes:
       - ./config/apache/phpmyadmin.conf:/etc/apache2/conf-enabled/phpmyadmin.conf
     labels:
-      com.docker.compose.project: '${DOMAIN_NAME:-default}'
+      - "com.docker.compose.project: '${DOMAIN_NAME:-default}"
+      - "traefik.enable=true"
+      - "traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.${DOMAIN_NAME:-default}.localhost`)"
+      - "traefik.http.services.phpmyadmin.loadbalancer.server.port=80"
 
 networks:
   symfony-vite-network:
