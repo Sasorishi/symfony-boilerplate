@@ -20,6 +20,32 @@ This structure is designed to separate the frontend (React + Vite) from the back
 - **PHP 8.3**: PHP version used for the backend.
 - **Node 18**: Node.js version used for the frontend.
 
+## Continuous Integration (CI) with GitHub Actions
+
+The project includes a CI workflow that:
+- Checks the Docker build **at the very start** of the pipeline (fail fast if Dockerfile or docker-compose errors).
+- Installs backend and frontend dependencies.
+- Runs code quality checks (PHPStan, PHPCS, ESLint).
+- Runs Symfony unit and integration tests.
+- Allows running tests inside Docker to guarantee reproducibility.
+
+### Example CI workflow (excerpt)
+
+```yaml
+jobs:
+  docker-build:
+    name: 🐳 Build Docker Images
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker images
+        run: docker compose build
+
+  setup-backend:
+    needs: docker-build
+    # ...
+```
+
 ## Getting Started
 
 ### Prerequisites
@@ -63,6 +89,21 @@ This structure is designed to separate the frontend (React + Vite) from the back
 
    - Access the application at `http://localhost`
 
+## Testing
+
+- **Backend tests** are located in `app/back/tests/` and use PHPUnit. To run backend tests:
+  ```bash
+  make test
+  # or inside the container:
+  docker compose run --rm php make test
+  ```
+- **Frontend tests** (if present) are located in `app/front/tests/` and can be run with:
+  ```bash
+  make front-test
+  # or inside the container:
+  docker compose run --rm node npm test
+  ```
+
 ## Development Workflow
 
 - **Symfony Backend**: The Symfony application is accessible through the API and can be developed and tested via the container. Any changes to the backend code should be made in the `src/` directory.
@@ -85,6 +126,7 @@ This structure is designed to separate the frontend (React + Vite) from the back
   - **`css/`**: CSS files for styling the application.
   - **`App.jsx`**: Main React component that wraps the application.
   - **`index.jsx`**: Entry point for React (rendering to the DOM).
+- **`tests/`**: Frontend tests (if present, e.g., Jest, React Testing Library).
 - **`package.json`**: Frontend dependencies (npm or yarn).
 - **`vite.config.js`**: Vite configuration for the frontend.
 - **`.eslint.config.js`**: ESLint configuration for code linting.
@@ -106,6 +148,7 @@ This structure is designed to separate the frontend (React + Vite) from the back
   - **`Security/`**: Security-related functionality (JWT authentication, roles, etc.).
   - **`Service/`**: Services for business logic and reusable functions.
   - **`EventListener/`**: Event listeners for Symfony events (optional).
+- **`tests/`**: Backend tests (PHPUnit).
 - **`.env`**: Environment variables for Symfony.
 - **`.gitignore`**: Specifies files and directories ignored by Git (e.g., `vendor`, `var`).
 - **`composer.json`**: PHP dependencies for the Symfony backend.
