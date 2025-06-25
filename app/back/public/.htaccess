@@ -1,0 +1,38 @@
+# Use the front controller as index file. It serves as a fallback solution when
+# every other rewrite/redirect fails (e.g. in an aliased environment without
+# mod_rewrite). Additionally, this reduces the matching process for the
+# start page (path "/").
+DirectoryIndex index.php
+
+# By default, Apache does not evaluate symbolic links if you did not enable this
+# feature in your server configuration. Uncomment the following line if you
+# install applications that use symlinks extensively.
+# Options +FollowSymlinks
+
+# Disallow directory listing
+Options -Indexes
+
+# Follow symbolic links in this directory.
+Options +FollowSymlinks
+
+# Enable Rewrite Engine
+RewriteEngine On
+
+# Set the RewriteBase to the root of the Symfony project
+# RewriteBase /
+
+# Redirect to URI without trailing slash (uncomment to activate)
+# RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteCond %{REQUEST_URI} (.+)/$
+# RewriteRule ^ %1 [R=301,L]
+
+# If the requested filename exists, serve it directly
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+# If the requested filename exists as a directory, serve it directly
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Otherwise, forward the request to index.php
+RewriteRule ^ index.php [L]

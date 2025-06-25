@@ -1,4 +1,4 @@
-FROM dunglas/frankenphp:1-php8.3 AS frankenphp_base
+FROM php:8.3-fpm
 
 WORKDIR /var/www/html
 
@@ -10,37 +10,24 @@ RUN curl -sS https://get.symfony.com/cli/installer | bash && \
 COPY . .
 
 # Installer les dépendances système
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    acl \
-    file \
-    gettext \
+RUN apt-get update && apt-get install -y \
     git \
-    curl \
-    gnupg \
+    unzip \
+    libicu-dev \
+    libzip-dev \
     libpq-dev \
-    libmariadb-dev \
-    autoconf \
-    bison \
-    re2c \
-    libxml2-dev \
-    && rm -rf /var/lib/apt/lists/*
+    libxml2-dev
 
 # Installer les extensions PHP
-RUN install-php-extensions \
-    @composer \
-    intl \
-    opcache \
-    zip \
-    pdo \
-    pdo_mysql \
-    pdo_pgsql
+RUN docker-php-ext-install intl opcache zip pdo pdo_mysql pdo_pgsql
 
-# Installer APCu
-RUN pecl install apcu && \
-    docker-php-ext-enable apcu
+# Installer Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Installer les dépendances Composer
 RUN composer install --no-interaction --optimize-autoloader --no-scripts
 
-# Exposer le port
-EXPOSE 80
+# Exposer le port pour php-fpm
+EXPOSE 9000
+
+CMD ["php-fpm"]
