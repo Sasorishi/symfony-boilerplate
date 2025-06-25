@@ -7,9 +7,20 @@ on:
     branches: [main, dev]
 
 jobs:
+  docker-build:
+    name: 🐳 Build Docker Images
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker images
+        run: docker compose build
+
   setup-backend:
     name: 📥 Install Backend Dependencies
     runs-on: ubuntu-latest
+    needs: docker-build
     env:
       APP_ENV: test
       APP_DEBUG: 1
@@ -21,7 +32,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.2"
+          php-version: "8.3"
           tools: composer:v2
           coverage: none
 
@@ -45,6 +56,7 @@ jobs:
   setup-frontend:
     name: 📥 Install Frontend Dependencies
     runs-on: ubuntu-latest
+    needs: docker-build
 
     steps:
       - name: Checkout Repository
@@ -90,6 +102,78 @@ jobs:
         run: vendor/bin/phpstan analyse -c phpstan.dist.neon --no-progress
         working-directory: app/back # ✅ Définit le bon dossier
 
+  backend-tests:
+    name: 🧪 Backend Tests
+    runs-on: ubuntu-latest
+    needs: [setup-backend, backend-code-quality]  # Ajout de la dépendance à backend-code-quality
+    env:
+      APP_ENV: test
+      APP_DEBUG: 1
+      DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/test_db?serverVersion=15&charset=utf8"
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        tools: composer:v2
+        coverage: xdebug
+    
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
+
+    - name: Copy .env.example
+      run: cp .env.example .env
+      working-directory: app/back
+    
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress
+      working-directory: app/back
+
+    - name: Create test database
+      working-directory: app/back
+      run: php bin/console doctrine:database:create --env=test
+
+    - name: Run Unit Tests
+      run: vendor/bin/phpunit --testsuite Unit --coverage-text --coverage-clover=coverage.xml
+      working-directory: app/back
+
+    - name: Run Integration Tests
+      run: vendor/bin/phpunit --testsuite Integration --coverage-text --coverage-clover=coverage.xml
+      working-directory: app/back
+
+    - name: Run Functional Tests
+      run: vendor/bin/phpunit --testsuite Functional --coverage-text --coverage-clover=coverage.xml
+      working-directory: app/back
+
+    - name: Cleanup test database
+      if: always()
+      run: php bin/console doctrine:database:drop --force --env=test --if-exists
+      working-directory: app/back
+
   frontend-code-quality:
     name: 🎨 Frontend Code Quality
     runs-on: ubuntu-latest
@@ -123,7 +207,7 @@ jobs:
   frontend-build:
     name: 🏗️ Build Frontend
     runs-on: ubuntu-latest
-    needs: [frontend-code-quality, backend-code-quality]
+    needs: [frontend-code-quality, backend-tests]
 
     steps:
       - name: Checkout Repository
