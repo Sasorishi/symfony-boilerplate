@@ -20,6 +20,10 @@ services:
       - symfony-vite-network
     labels:
       - "traefik.enable=true"
+      - "traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)"
+      - "traefik.http.routers.http-catchall.entrypoints=web"
+      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
   php:
     image: thecodingmachine/php:8.3-v4-apache-node22
